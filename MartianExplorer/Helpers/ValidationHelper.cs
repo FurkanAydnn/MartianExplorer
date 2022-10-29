@@ -1,5 +1,4 @@
-﻿using MartianExplorer.Exceptions;
-using MartianExplorer.Models.Entitites;
+﻿using MartianExplorer.Models.Entitites;
 
 namespace MartianExplorer.Helpers
 {

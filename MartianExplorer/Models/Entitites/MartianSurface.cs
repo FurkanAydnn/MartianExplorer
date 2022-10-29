@@ -1,5 +1,4 @@
-﻿using MartianExplorer.Helpers;
-using System.Linq;
+﻿using System.Linq;
 
 namespace MartianExplorer.Models.Entitites
 {

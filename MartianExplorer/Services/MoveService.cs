@@ -1,5 +1,4 @@
-﻿using MartianExplorer.Helpers;
-using MartianExplorer.Models.Entitites;
+﻿using MartianExplorer.Models.Entitites;
 using System;
 
 namespace MartianExplorer.Services

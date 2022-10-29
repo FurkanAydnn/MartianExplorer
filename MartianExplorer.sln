@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32819.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MartianExplorer", "MartianExplorer\MartianExplorer.csproj", "{38F61009-8A26-4F5C-A832-2C22004B8A8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MartianExplorer", "MartianExplorer\MartianExplorer.csproj", "{38F61009-8A26-4F5C-A832-2C22004B8A8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MartianExplorerTests", "tests\MartianExplorerTests\MartianExplorerTests.csproj", "{35FE033A-7A8F-413A-A574-F7E499FC6603}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{38F61009-8A26-4F5C-A832-2C22004B8A8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38F61009-8A26-4F5C-A832-2C22004B8A8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38F61009-8A26-4F5C-A832-2C22004B8A8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35FE033A-7A8F-413A-A574-F7E499FC6603}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35FE033A-7A8F-413A-A574-F7E499FC6603}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35FE033A-7A8F-413A-A574-F7E499FC6603}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35FE033A-7A8F-413A-A574-F7E499FC6603}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

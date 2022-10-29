@@ -1,14 +1,18 @@
-﻿using MartianExplorer.Helpers;
+﻿using MartianExplorer.Exceptions;
+using MartianExplorer.Helpers;
 using MartianExplorer.Models.Entitites;
 using MartianExplorer.Services;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MartianExplorer.Controller
 {
     public class MartianExplorerController
     {
-        private ILocationService _locationService;
+        private IMoveService _moveService;
         private MartianSurface _martianSurface;
 
         public void GetInitialParameters()
@@ -26,8 +30,11 @@ namespace MartianExplorer.Controller
                     RawData = sizeParameters
                 };
 
-                if (!martianSurface.Validate())
+                var vr = martianSurface.Validate();
+
+                if (!vr.IsValid)
                 {
+                    ConsoleHelper.WriteLetterByLetter(vr.Message);
                     continue;
                 }
 
@@ -36,53 +43,37 @@ namespace MartianExplorer.Controller
                 martianSurface.Height = Convert.ToInt32(fieldMaxCoordinates.Last());
 
                 _martianSurface = martianSurface;
-                _locationService = new LocationService(martianSurface);
+                _moveService = new MoveSerive(martianSurface);
                 break;
             };
         }
 
-        public void ExploreMars()
+        public void ExploreMars(int explorerCount)
         {
-            Explorer firstExplorer = null;
-            LocationRequest firstLocationRequest = null;
-            Explorer secondExplorer = null;
-            LocationRequest secondLocationRequest = null;
+            (Explorer explorer, MoveCommand moveCommand)[] tuples = new (Explorer, MoveCommand)[explorerCount];
 
             while (true)
             {
-
                 try
                 {
-                    if (firstExplorer == null)
+                    for (int i = 0; i < explorerCount; i++)
                     {
-                        ConsoleHelper.WriteLetterByLetter("Please enter the first explorer's coordinates:");
-                        firstExplorer = GetExplorer(Console.ReadLine());
+                        if (tuples[i].explorer == null)
+                        {
+                            ConsoleHelper.WriteLetterByLetter($"Please enter the {i + 1}. explorer's coordinates:");
+                            tuples[i].explorer = GetExplorer(Console.ReadLine());
+                        }
+
+                        if (tuples[i].moveCommand == null)
+                        {
+                            ConsoleHelper.WriteLetterByLetter($"Please enter the {i + 1}. explorer's move command:");
+                            tuples[i].moveCommand = GetMoveCommand(Console.ReadLine());
+                        }
                     }
 
-                    if (firstLocationRequest == null)
-                    {
-                        ConsoleHelper.WriteLetterByLetter("Please enter the first explorer's move command:");
-                        firstLocationRequest = GetMoveCommand(Console.ReadLine());
+                    tuples.ToList().ForEach(x => _moveService.Move(x.explorer, x.moveCommand));
+                    tuples.ToList().ForEach(x => ConsoleHelper.WriteLetterByLetter($"{x.explorer.XCoordinate} {x.explorer.YCoordinate} {x.explorer.Direction.GetDisplay()}"));
 
-                    }
-
-                    if (secondExplorer == null)
-                    {
-                        ConsoleHelper.WriteLetterByLetter("Please enter the second explorer's coordinates:");
-                        secondExplorer = GetExplorer(Console.ReadLine());
-                    }
-
-                    if (secondLocationRequest == null)
-                    {
-                        ConsoleHelper.WriteLetterByLetter("Please enter the second explorer's move command");
-                        secondLocationRequest = GetMoveCommand(Console.ReadLine());
-                    }
-
-                    _locationService.Move(firstExplorer, firstLocationRequest);
-                    _locationService.Move(secondExplorer, secondLocationRequest);
-
-                    ConsoleHelper.WriteLetterByLetter($"{firstExplorer.XCoordinate} {firstExplorer.YCoordinate} {firstExplorer.Direction}");
-                    ConsoleHelper.WriteLetterByLetter($"{secondExplorer.XCoordinate} {secondExplorer.YCoordinate} {secondExplorer.Direction}");
                     break;
                 }
                 catch (Exception ex)
@@ -90,7 +81,6 @@ namespace MartianExplorer.Controller
                     ConsoleHelper.WriteLetterByLetter(ex.Message);
                     continue;
                 }
-
             }
         }
 
@@ -101,9 +91,11 @@ namespace MartianExplorer.Controller
                 RawData = rawData
             };
 
-            if (!explorer.Validate())
+            var vr = explorer.Validate();
+
+            if (!vr.IsValid)
             {
-                throw new ApplicationException("Explorer is not valid");
+                throw new ValidationException(vr.Message);
             }
 
             string[] explorerParameters = rawData.Split(' ');
@@ -111,50 +103,41 @@ namespace MartianExplorer.Controller
             int givenXCoordinate = Convert.ToInt32(explorerParameters[0]);
             int givenYCoordinate = Convert.ToInt32(explorerParameters[1]);
 
-            if(givenXCoordinate < 0)
+            if (givenXCoordinate < 0 || givenXCoordinate > _martianSurface.Width)
             {
-                explorer.XCoordinate = 0;
-            }
-            else if(givenXCoordinate > _martianSurface.Width)
-            {
-                explorer.XCoordinate = _martianSurface.Width;
-            }
-            else
-            {
-                explorer.XCoordinate = givenXCoordinate;    
-            }
-            
-            if(givenYCoordinate < 0)
-            {
-                explorer.YCoordinate = 0;
-            }
-            else if(givenYCoordinate > _martianSurface.Height)
-            {
-                explorer.YCoordinate = _martianSurface.Height;
-            }
-            else
-            {
-                explorer.YCoordinate = givenYCoordinate;    
+                throw new ValidationException($"X coordinate of explorer must be between 0 and {_martianSurface.Width}");
             }
 
-            explorer.Direction = Enum.Parse<Direction>(explorerParameters[2].ToUpper());
+            if (givenYCoordinate < 0 || givenYCoordinate > _martianSurface.Height)
+            {
+                throw new ValidationException($"Y Coordinate of explorer must be between 0 and {_martianSurface.Width}");
+            }
+
+            explorer.XCoordinate = givenXCoordinate;
+            explorer.YCoordinate = givenYCoordinate;
+            explorerParameters[2].ToUpper().TryGetValueFromDisplay(out Direction direction);
+            explorer.Direction = direction;
 
             return explorer;
         }
 
-        private LocationRequest GetMoveCommand(string rawData)
+        private MoveCommand GetMoveCommand(string rawData)
         {
-            var lr = new LocationRequest()
+            var moveCommand = new MoveCommand()
             {
-                MoveCommand = rawData
+                RawData = rawData
             };
 
-            if (!lr.Validate())
+            var vr = moveCommand.Validate();
+
+            if (!vr.IsValid)
             {
-                throw new ApplicationException("Command is not valid");
+                throw new ValidationException(vr.Message);
             }
 
-            return lr;
+            moveCommand.Command = rawData.ToUpper();
+
+            return moveCommand;
         }
     }
 }

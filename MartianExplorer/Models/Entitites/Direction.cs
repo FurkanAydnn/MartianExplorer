@@ -5,12 +5,12 @@ namespace MartianExplorer.Models.Entitites
     public enum Direction
     {
         [Display(Name = "N")]
-        N,
-        [Display(Name = "W")]
-        W,
+        North,
+        [Display(Name = "E")]
+        East,
         [Display(Name = "S")]
-        S,
-        [Display(Name = "E") ]
-        E
+        South,
+        [Display(Name = "W") ]
+        West
     }
 }

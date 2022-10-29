@@ -1,9 +1,11 @@
-﻿using MartianExplorer.Models.Entitites;
+﻿using MartianExplorer.Exceptions;
+using MartianExplorer.Models.Entitites;
+
 namespace MartianExplorer.Helpers
 {
     public static class ValidationHelper
     {
-        public static bool Validate<T>(this T input)
+        public static ValidationResult Validate<T>(this T input)
         {
             switch (input)
             {
@@ -11,10 +13,10 @@ namespace MartianExplorer.Helpers
                     return MartianSurface.Validate((dynamic)input);
                 case Explorer:
                     return Explorer.Validate((dynamic)input);
-                case LocationRequest:
-                    return LocationRequest.Validate((dynamic)input);
+                case MoveCommand:
+                    return MoveCommand.Validate((dynamic)input);
                 default:
-                    return false;
+                    return new ValidationResult() { IsValid = false };
             }
         }
     }

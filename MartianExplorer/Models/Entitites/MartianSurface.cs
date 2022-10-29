@@ -3,29 +3,29 @@ using System.Linq;
 
 namespace MartianExplorer.Models.Entitites
 {
-    public class MartianSurface
+    public class MartianSurface : ValidatableBase
     {
         public int Width { get; set; }
         public int Height { get; set; }
-        public string RawData { get; set; }
 
-        public static bool Validate(MartianSurface martianSurface)
+        public static ValidationResult Validate(MartianSurface martianSurface)
         {
+            var result = new ValidationResult() { IsValid = true };
+
             var values = martianSurface.RawData.Split(' ');
 
             if (values.Length != 2)
             {
-                ConsoleHelper.WriteLetterByLetter("Mars field size parameters count must be 2.");
-                return false;
+                result.IsValid = false;
+                result.Message = "Mars field size parameters count must be 2.";
             }
-
-            if (!values.All(x => int.TryParse(x, out var y)))
+            else if (!values.All(x => int.TryParse(x, out var y)))
             {
-                ConsoleHelper.WriteLetterByLetter("All Mars field size parameters must be an integer.");
-                return false;
+                result.IsValid = false;
+                result.Message = "All Mars field size parameters must be an integer.";
             }
 
-            return true;
+            return result;
         }
     }
 }

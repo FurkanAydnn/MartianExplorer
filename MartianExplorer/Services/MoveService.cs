@@ -8,11 +8,11 @@ namespace MartianExplorer.Services
     {
         void Move(Explorer explorer, MoveCommand moveCommand);
     }
-    public class MoveSerive : IMoveService
+    public class MoveService : IMoveService
     {
         private readonly MartianSurface _martianSurface;
 
-        public MoveSerive(MartianSurface marsField)
+        public MoveService(MartianSurface marsField)
         {
             _martianSurface = marsField;
         }

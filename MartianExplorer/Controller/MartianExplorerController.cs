@@ -43,7 +43,7 @@ namespace MartianExplorer.Controller
                 martianSurface.Height = Convert.ToInt32(fieldMaxCoordinates.Last());
 
                 _martianSurface = martianSurface;
-                _moveService = new MoveSerive(martianSurface);
+                _moveService = new MoveService(martianSurface);
                 break;
             };
         }

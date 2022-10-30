@@ -9,7 +9,7 @@ namespace MartianExplorer.Models.Entitites
         public static ValidationResult Validate(MoveCommand moveCommand)
         {
             var result = new ValidationResult() { IsValid = false };
-            Regex rgx = new Regex("[^RLM][^rlm]");
+            Regex rgx = new Regex("[^RLMrlm]");
             if (!rgx.IsMatch(moveCommand.RawData))
             {
                result.IsValid = true;
